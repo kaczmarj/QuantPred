@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-import util
-from test_to_bw_fast import read_model
-import wandb
-from test_to_bw_fast import get_config
-import glob, os
-import pandas as pd
+import glob
+import os
+
 import numpy as np
+import pandas as pd
+import wandb
 from tqdm import tqdm
-from metrics import np_poiss, np_mse, get_scaled_mse, get_js_dist, np_pr
+
+import util
+from metrics import get_js_dist, get_scaled_mse, np_mse, np_poiss, np_pr
+from test_to_bw_fast import get_config, read_model
 
 
 def evaluate_per_cell_line(run_path, testset, targets, log_all, choose_cell=-1):

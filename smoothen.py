@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
-import os
-import pandas as pd
-import util
-from test_to_bw_fast import get_vals_per_range, get_list_pr
-from tqdm import tqdm
 import multiprocessing as mp
+import os
+
+import pandas as pd
 from scipy.ndimage import gaussian_filter1d
+from tqdm import tqdm
+
+import util
+from test_to_bw_fast import get_list_pr, get_vals_per_range
 
 
 def smooth_one_binsize_one_cell_line(file, bin_size=2048, out_dir="gauss_smooth"):

@@ -2,10 +2,12 @@
 
 import json
 import os
-import h5py
-import util
 from optparse import OptionParser
+
+import h5py
 import tensorflow as tf
+
+import util
 
 
 def main():

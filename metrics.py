@@ -1,13 +1,13 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import tensorflow as tf
-import matplotlib.pyplot as plt
-import seaborn as sns
 import scipy
+import seaborn as sns
 import sklearn.metrics as skm
-from tensorflow.python.keras import backend as K
-from scipy.spatial import distance
+import tensorflow as tf
 from scipy import stats
+from scipy.spatial import distance
+from tensorflow.python.keras import backend as K
 
 
 def np_pr(all_truth, all_pred):

@@ -1,11 +1,13 @@
-import tensorflow as tf
-import tensorflow.keras as keras
+import os
 
 # import tensorflow_probability as tfp
 import numpy as np
-import os, yaml
-from loss import *
+import tensorflow as tf
+import tensorflow.keras as keras
+import yaml
+
 import metrics
+from loss import *
 
 
 def basenjimod(input_shape, output_shape, wandb_config={}):

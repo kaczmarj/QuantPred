@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 """SeqNN trainer"""
-from packaging import version
 import numpy as np
 import tensorflow as tf
-
+from packaging import version
 
 
 class Trainer:

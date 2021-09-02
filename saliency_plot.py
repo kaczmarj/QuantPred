@@ -1,15 +1,16 @@
-import modelzoo
-import tensorflow as tf
-import matplotlib.pyplot as plt
-import pandas as pd
-import explain
-import util
-from loss import *
-import os
 import json
-import logomaker
+import os
 import sys
 
+import logomaker
+import matplotlib.pyplot as plt
+import pandas as pd
+import tensorflow as tf
+
+import explain
+import modelzoo
+import util
+from loss import *
 
 # model_path = '/home/shush/profile/QuantPred/datasets/top25/grid2/model_i_1024_w_1_bpnet_mse.h5'
 model_path = sys.argv[1]

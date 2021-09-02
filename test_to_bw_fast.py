@@ -1,23 +1,25 @@
 #!/usr/bin/env python
-import util
-import os
-import numpy as np
 import csv
-import pyBigWig
-import tensorflow as tf
-from modelzoo import GELU
-import time
-import sys
-from scipy import stats
-import yaml
 import glob
+import os
 import subprocess
-import pandas as pd
-from tqdm import tqdm
-import seaborn as sns
+import sys
+import time
+
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error
+import numpy as np
+import pandas as pd
+import pyBigWig
+import seaborn as sns
+import tensorflow as tf
+import yaml
+from scipy import stats
 from scipy.spatial import distance
+from sklearn.metrics import mean_squared_error
+from tqdm import tqdm
+
+import util
+from modelzoo import GELU
 
 
 def enforce_constant_size(bed_path, output_path, window, compression=None):

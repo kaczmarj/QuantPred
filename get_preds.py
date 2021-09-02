@@ -1,11 +1,13 @@
-import tensorflow as tf
 import os
-import numpy as np
-from modelzoo import *
 import pickle
+
+import numpy as np
+import tensorflow as tf
+
 import custom_fit
 import util
 from metrics import *
+from modelzoo import *
 
 # y axis fixed somewhere in the Average
 # remove mse

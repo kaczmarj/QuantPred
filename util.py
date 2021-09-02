@@ -1,12 +1,12 @@
+import glob
 import json
 import os
-import glob
-import numpy as np
-import tensorflow as tf
-from natsort import natsorted
 
+import numpy as np
 # import metrics
 import scipy
+import tensorflow as tf
+from natsort import natsorted
 
 ################################################################
 # functions for loading tfr files into tfr dataset

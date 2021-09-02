@@ -1,8 +1,11 @@
-import sys, time
+import sys
+import time
+
 import numpy as np
 import tensorflow as tf
-import metrics
 import tensorflow_probability as tfp
+
+import metrics
 
 
 class RobustTrainer:

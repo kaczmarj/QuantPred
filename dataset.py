@@ -13,13 +13,14 @@
 # limitations under the License.
 # =========================================================================
 from __future__ import print_function
+
 import glob
 import json
 import sys
 
-from natsort import natsorted
 import numpy as np
 import tensorflow as tf
+from natsort import natsorted
 
 # TFRecord constants
 TFR_INPUT = "sequence"

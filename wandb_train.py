@@ -2,18 +2,18 @@
 
 import json
 import os
-import h5py
 import sys
-import util
+
+import h5py
 import numpy as np
 import tensorflow as tf
-from loss import logclass
-
 # import trainer_class
 import wandb
 
 # import bpnet_original_fit as bpnet_fit
 import custom_fit
+import util
+from loss import logclass
 
 
 def fit_robust(

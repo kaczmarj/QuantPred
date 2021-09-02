@@ -1,16 +1,18 @@
-import numpy as np
-import tensorflow as tf
 import math
-import matplotlib.pyplot as plt
-import pandas as pd
-import logomaker
-import subprocess
-import h5py
 import os
 import shutil
-import util
-import custom_fit
+import subprocess
+
+import h5py
+import logomaker
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
+import tensorflow as tf
+
+import custom_fit
+import util
 
 
 def task_robustness(

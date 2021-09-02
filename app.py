@@ -1,12 +1,13 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import pandas as pd
-import plotly.express as px
+import flask
 import h5py
 import numpy as np
-import flask
+import pandas as pd
+import plotly.express as px
 import plotly.graph_objects as go
+
 from metrics import *
 
 # y axis fixed somewhere in the Average

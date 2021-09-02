@@ -2,16 +2,18 @@
 
 import json
 import os
-import h5py
-import util
+import time
 from optparse import OptionParser
+
+import h5py
 import numpy as np
 import tensorflow as tf
-from modelzoo import *
-from loss import *
+
 import dataset
 import trainer_class
-import time
+import util
+from loss import *
+from modelzoo import *
 
 
 def main():

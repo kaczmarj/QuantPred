@@ -1,8 +1,10 @@
-import tensorflow as tf
+import sys
+
 import h5py
+import tensorflow as tf
+
 import explain
 import modelzoo
-import sys
 
 test_data = "./datasets/VCF/filtered_test.h5"
 f = h5py.File(test_data, "r")
