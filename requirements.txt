@@ -1,0 +1,15 @@
+dash
+flask
+matplotlib
+natsort
+numpy
+packaging
+pandas
+plotly
+pybigwig
+scikit-learn
+scipy
+seaborn
+tqdm
+wandb
+wandb-callbacks
