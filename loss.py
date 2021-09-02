@@ -308,3 +308,20 @@ class multiscale_poisson(tf.keras.losses.Loss):
             bin_loss = self.loss_fn(y_true_binned, y_pred_binned)
             loss_values.append(self.alpha_weights[i] * bin_loss)
         return loss_values
+
+
+def get_callable(name: str, case_sensitive: bool = True):
+    """Return callable object from a string name."""
+    if case_sensitive:
+        _globals = globals()
+    else:
+        # convert all keys to lower-case
+        _globals = {k.lower(): v for k, v in globals().items()}
+        name = name.lower()
+
+    fn = _globals.get(name, None)
+    if fn is None:
+        raise ValueError(f"unknown object: {name}")
+    if not callable(fn):
+        raise ValueError(f"object '{fn}' is not callable")
+    return fn

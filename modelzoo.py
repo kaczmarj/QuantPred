@@ -7,7 +7,8 @@ import tensorflow.keras as keras
 import yaml
 
 import metrics
-from loss import *
+
+# from loss import *
 
 
 def basenjimod(input_shape, output_shape, wandb_config={}):
@@ -132,7 +133,8 @@ def basenjimod(input_shape, output_shape, wandb_config={}):
         conv_type="standard",
         dropout=drp4,
         repeat=2,
-        round=False,  # repeat=4 TODO:figure out scaling factor for the number of repeats
+        # TODO: figure out scaling factor for the number of repeats
+        round=False,  # repeat=4
         activation="gelu",
         batch_norm=True,
         bn_momentum=0.9,
@@ -477,7 +479,7 @@ def dilated_residual(
     dropout=0,
     repeat=1,
     round=False,
-    **kwargs
+    **kwargs,
 ):
     """Construct a residual dilated convolution block."""
 
@@ -498,7 +500,7 @@ def dilated_residual(
             dilation_rate=int(np.round(dilation_rate)),
             conv_type=conv_type,
             bn_gamma="ones",
-            **kwargs
+            **kwargs,
         )
 
         # return
@@ -507,7 +509,7 @@ def dilated_residual(
             filters=rep_input.shape[-1],
             dropout=dropout,
             bn_gamma="zeros",
-            **kwargs
+            **kwargs,
         )
 
         # residual add
@@ -529,7 +531,7 @@ def dense_layer(
     kernel_initializer="he_normal",
     l2_scale=0,
     l1_scale=0,
-    **kwargs
+    **kwargs,
 ):
 
     # apply dense layer
@@ -987,3 +989,20 @@ def load_model(run_dir, compile):
             metrics=[metric, "mse"],
         )
     return model
+
+
+def get_callable(name: str, case_sensitive: bool = True):
+    """Return callable object from a string name."""
+    if case_sensitive:
+        _globals = globals()
+    else:
+        # convert all keys to lower-case
+        _globals = {k.lower(): v for k, v in globals().items()}
+        name = name.lower()
+
+    fn = _globals.get(name, None)
+    if fn is None:
+        raise ValueError(f"unknown object: {name}")
+    if not callable(fn):
+        raise ValueError(f"object '{fn}' is not callable")
+    return fn

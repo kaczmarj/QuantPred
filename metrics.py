@@ -526,3 +526,20 @@ class PearsonR(tf.keras.metrics.Metric):
 
     def reset_states(self):
         K.batch_set_value([(v, np.zeros(self._shape)) for v in self.variables])
+
+
+def get_callable(name: str, case_sensitive: bool = True):
+    """Return callable object from a string name."""
+    if case_sensitive:
+        _globals = globals()
+    else:
+        # convert all keys to lower-case
+        _globals = {k.lower(): v for k, v in globals().items()}
+        name = name.lower()
+
+    fn = _globals.get(name, None)
+    if fn is None:
+        raise ValueError(f"unknown object: {name}")
+    if not callable(fn):
+        raise ValueError(f"object '{fn}' is not callable")
+    return fn
