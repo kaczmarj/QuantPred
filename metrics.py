@@ -16,64 +16,71 @@ import seaborn as sns
 from scipy.spatial import distance
 from scipy import stats
 
+
 def np_pr(all_truth, all_pred):
     pr_all = []
-    N,L,C = all_truth.shape
-    flat_truth = all_truth.reshape(N*L, C)
-    flat_pred = all_pred.reshape(N*L, C)
+    N, L, C = all_truth.shape
+    flat_truth = all_truth.reshape(N * L, C)
+    flat_pred = all_pred.reshape(N * L, C)
     for c in range(C):
-        pr = stats.pearsonr(flat_truth[:,c], flat_pred[:,c])[0]
+        pr = stats.pearsonr(flat_truth[:, c], flat_pred[:, c])[0]
         pr_all.append(pr)
     return pr_all
 
 
 def np_mse(a, b):
-    return ((a - b)**2)
+    return (a - b) ** 2
+
 
 def get_scaled_mse(all_truth, all_pred):
     N, L, C = all_pred.shape
-    flat_pred = all_pred.reshape(N*L, C)
-    flat_truth = all_truth.reshape(N*L, C)
+    flat_pred = all_pred.reshape(N * L, C)
+    flat_truth = all_truth.reshape(N * L, C)
     truth_per_cell_line_sum = flat_truth.sum(axis=0)
     pred_per_cell_line_sum = flat_pred.sum(axis=0)
 
-    scaling_factors =  truth_per_cell_line_sum / pred_per_cell_line_sum
+    scaling_factors = truth_per_cell_line_sum / pred_per_cell_line_sum
     scaled_preds = scaling_factors * flat_pred
 
     per_seq_scaled_mse = np_mse(flat_truth, scaled_preds)
 
     return per_seq_scaled_mse.reshape(N, L, C).mean(axis=1)
 
+
 def get_js_dist(x, y):
     pseudocount = np.finfo(float).eps
     norm_arrays = []
     for array in [x, y]:
-        array = np.clip(array,0,array.max())
+        array = np.clip(array, 0, array.max())
         array += pseudocount
-        norm_array = array/np.expand_dims(array.sum(axis=1), 1)
+        norm_array = array / np.expand_dims(array.sum(axis=1), 1)
         norm_arrays.append(norm_array)
     return distance.jensenshannon(norm_arrays[0], norm_arrays[1], axis=1)
 
-def get_conc_js_dist(x,y):
+
+def get_conc_js_dist(x, y):
     pseudocount = np.finfo(float).eps
     norm_arrays = []
     for raw_array in [x, y]:
         raw_array = raw_array.flatten()
-        array = np.clip(raw_array,0,raw_array.max())
+        array = np.clip(raw_array, 0, raw_array.max())
         array += pseudocount
-        norm_array = array/array.sum()
+        norm_array = array / array.sum()
         norm_arrays.append(norm_array)
     print(norm_arrays[0].shape)
     return distance.jensenshannon(norm_arrays[0], norm_arrays[1])
+
 
 def scipy_pr(y_true, y_pred):
 
     pr = scipy.stats.pearsonr(y_true, y_pred)[0]
     return pr
 
+
 def scipy_sc(a, b):
     sc = scipy.stats.spearmanr(a, b)
     return sc[0]
+
 
 def np_poiss(y_true, y_pred):
     pseudocount = np.finfo(float).eps
@@ -83,95 +90,123 @@ def np_poiss(y_true, y_pred):
 
 
 class PearsonR(tf.keras.metrics.Metric):
-  def __init__(self, summarize=True, name='pearsonr', **kwargs):
-    super(PearsonR, self).__init__(name=name, **kwargs)
-    self._summarize = summarize
-    self._shape = (15,)
-    self._count = self.add_weight(name='count', shape=self._shape, initializer='zeros')
+    def __init__(self, summarize=True, name="pearsonr", **kwargs):
+        super(PearsonR, self).__init__(name=name, **kwargs)
+        self._summarize = summarize
+        self._shape = (15,)
+        self._count = self.add_weight(
+            name="count", shape=self._shape, initializer="zeros"
+        )
 
-    self._product = self.add_weight(name='product', shape=self._shape, initializer='zeros')
-    self._true_sum = self.add_weight(name='true_sum', shape=self._shape, initializer='zeros')
-    self._true_sumsq = self.add_weight(name='true_sumsq', shape=self._shape, initializer='zeros')
-    self._pred_sum = self.add_weight(name='pred_sum', shape=self._shape, initializer='zeros')
-    self._pred_sumsq = self.add_weight(name='pred_sumsq', shape=self._shape, initializer='zeros')
+        self._product = self.add_weight(
+            name="product", shape=self._shape, initializer="zeros"
+        )
+        self._true_sum = self.add_weight(
+            name="true_sum", shape=self._shape, initializer="zeros"
+        )
+        self._true_sumsq = self.add_weight(
+            name="true_sumsq", shape=self._shape, initializer="zeros"
+        )
+        self._pred_sum = self.add_weight(
+            name="pred_sum", shape=self._shape, initializer="zeros"
+        )
+        self._pred_sumsq = self.add_weight(
+            name="pred_sumsq", shape=self._shape, initializer="zeros"
+        )
 
-  def update_state(self, y_true, y_pred, sample_weight=None):
-    y_true = tf.cast(y_true, 'float32')
-    y_pred = tf.cast(y_pred, 'float32')
+    def update_state(self, y_true, y_pred, sample_weight=None):
+        y_true = tf.cast(y_true, "float32")
+        y_pred = tf.cast(y_pred, "float32")
 
-    product = tf.reduce_sum(tf.multiply(y_true, y_pred), axis=[0,1])
-    self._product.assign_add(product)
+        product = tf.reduce_sum(tf.multiply(y_true, y_pred), axis=[0, 1])
+        self._product.assign_add(product)
 
-    true_sum = tf.reduce_sum(y_true, axis=[0,1])
-    self._true_sum.assign_add(true_sum)
+        true_sum = tf.reduce_sum(y_true, axis=[0, 1])
+        self._true_sum.assign_add(true_sum)
 
-    true_sumsq = tf.reduce_sum(tf.math.square(y_true), axis=[0,1])
-    self._true_sumsq.assign_add(true_sumsq)
+        true_sumsq = tf.reduce_sum(tf.math.square(y_true), axis=[0, 1])
+        self._true_sumsq.assign_add(true_sumsq)
 
-    pred_sum = tf.reduce_sum(y_pred, axis=[0,1])
-    self._pred_sum.assign_add(pred_sum)
+        pred_sum = tf.reduce_sum(y_pred, axis=[0, 1])
+        self._pred_sum.assign_add(pred_sum)
 
-    pred_sumsq = tf.reduce_sum(tf.math.square(y_pred), axis=[0,1])
-    self._pred_sumsq.assign_add(pred_sumsq)
+        pred_sumsq = tf.reduce_sum(tf.math.square(y_pred), axis=[0, 1])
+        self._pred_sumsq.assign_add(pred_sumsq)
 
-    count = tf.ones_like(y_true)
-    count = tf.reduce_sum(count, axis=[0,1])
-    self._count.assign_add(count)
+        count = tf.ones_like(y_true)
+        count = tf.reduce_sum(count, axis=[0, 1])
+        self._count.assign_add(count)
 
-  def result(self):
-    true_mean = tf.divide(self._true_sum, self._count)
-    true_mean2 = tf.math.square(true_mean)
-    pred_mean = tf.divide(self._pred_sum, self._count)
-    pred_mean2 = tf.math.square(pred_mean)
+    def result(self):
+        true_mean = tf.divide(self._true_sum, self._count)
+        true_mean2 = tf.math.square(true_mean)
+        pred_mean = tf.divide(self._pred_sum, self._count)
+        pred_mean2 = tf.math.square(pred_mean)
 
-    term1 = self._product
-    term2 = -tf.multiply(true_mean, self._pred_sum)
-    term3 = -tf.multiply(pred_mean, self._true_sum)
-    term4 = tf.multiply(self._count, tf.multiply(true_mean, pred_mean))
-    covariance = term1 + term2 + term3 + term4
+        term1 = self._product
+        term2 = -tf.multiply(true_mean, self._pred_sum)
+        term3 = -tf.multiply(pred_mean, self._true_sum)
+        term4 = tf.multiply(self._count, tf.multiply(true_mean, pred_mean))
+        covariance = term1 + term2 + term3 + term4
 
-    true_var = self._true_sumsq - tf.multiply(self._count, true_mean2)
-    pred_var = self._pred_sumsq - tf.multiply(self._count, pred_mean2)
-    tp_var = tf.multiply(tf.math.sqrt(true_var), tf.math.sqrt(pred_var))
-    correlation = tf.divide(covariance, tp_var)
+        true_var = self._true_sumsq - tf.multiply(self._count, true_mean2)
+        pred_var = self._pred_sumsq - tf.multiply(self._count, pred_mean2)
+        tp_var = tf.multiply(tf.math.sqrt(true_var), tf.math.sqrt(pred_var))
+        correlation = tf.divide(covariance, tp_var)
 
-    if self._summarize:
-        return tf.reduce_mean(correlation)
-    else:
-        return correlation
+        if self._summarize:
+            return tf.reduce_mean(correlation)
+        else:
+            return correlation
 
-  def reset_states(self):
-      K.batch_set_value([(v, np.zeros(self._shape)) for v in self.variables])
+    def reset_states(self):
+        K.batch_set_value([(v, np.zeros(self._shape)) for v in self.variables])
 
 
 def metrify(func):
-    '''Wrapper for getting per TF metric from TF losses'''
-    def wrapper(y_true,y_pred):
+    """Wrapper for getting per TF metric from TF losses"""
+
+    def wrapper(y_true, y_pred):
         y_true = tf.expand_dims(y_true, axis=-1)
         y_pred = tf.expand_dims(y_pred, axis=-1)
-        return func(y_true,y_pred)
+        return func(y_true, y_pred)
+
     return wrapper
 
 
-def metric_fftmse(y_true,y_pred):
-    '''MSE(FFT) using scipy for not runnign into memory issues during evaluation'''
-    return np.mean(np.mean(np.square((scipy.fft.fft(y_true)-scipy.fft.fft(y_pred)).astype('float')), axis=0), axis=0)
+def metric_fftmse(y_true, y_pred):
+    """MSE(FFT) using scipy for not runnign into memory issues during evaluation"""
+    return np.mean(
+        np.mean(
+            np.square((scipy.fft.fft(y_true) - scipy.fft.fft(y_pred)).astype("float")),
+            axis=0,
+        ),
+        axis=0,
+    )
 
-def metric_fftabs(y_true,y_pred):
-    '''Abs(FFT)'''
-    return np.mean((np.abs((scipy.fft.fft(y_true)-scipy.fft.fft(y_pred)).astype('float'), axis=0)))
+
+def metric_fftabs(y_true, y_pred):
+    """Abs(FFT)"""
+    return np.mean(
+        (
+            np.abs(
+                (scipy.fft.fft(y_true) - scipy.fft.fft(y_pred)).astype("float"), axis=0
+            )
+        )
+    )
+
 
 def metric_pearsonr(y, pred):
-    y_true = tf.cast(y, 'float32')
-    y_pred = tf.cast(pred, 'float32')
+    y_true = tf.cast(y, "float32")
+    y_pred = tf.cast(pred, "float32")
 
-    product = tf.reduce_sum(tf.multiply(y_true, y_pred), axis=[0,1])
-    true_sum = tf.reduce_sum(y_true, axis=[0,1])
-    true_sumsq = tf.reduce_sum(tf.math.square(y_true), axis=[0,1])
-    pred_sum = tf.reduce_sum(y_pred, axis=[0,1])
-    pred_sumsq = tf.reduce_sum(tf.math.square(y_pred), axis=[0,1])
+    product = tf.reduce_sum(tf.multiply(y_true, y_pred), axis=[0, 1])
+    true_sum = tf.reduce_sum(y_true, axis=[0, 1])
+    true_sumsq = tf.reduce_sum(tf.math.square(y_true), axis=[0, 1])
+    pred_sum = tf.reduce_sum(y_pred, axis=[0, 1])
+    pred_sumsq = tf.reduce_sum(tf.math.square(y_pred), axis=[0, 1])
     count = tf.ones_like(y_true)
-    count = tf.reduce_sum(count, axis=[0,1])
+    count = tf.reduce_sum(count, axis=[0, 1])
     true_mean = tf.divide(true_sum, count)
     true_mean2 = tf.math.square(true_mean)
     pred_mean = tf.divide(pred_sum, count)
@@ -189,17 +224,18 @@ def metric_pearsonr(y, pred):
     correlation = tf.divide(covariance, tp_var)
     return correlation
 
+
 def metric_r2(y, pred):
 
-    y_true = tf.cast(y, 'float32')
-    y_pred = tf.cast(pred, 'float32')
+    y_true = tf.cast(y, "float32")
+    y_pred = tf.cast(pred, "float32")
     shape = y_true.shape[-1]
-    true_sum = tf.reduce_sum(y_true, axis=[0,1])
-    true_sumsq = tf.reduce_sum(tf.math.square(y_true), axis=[0,1])
-    product = tf.reduce_sum(tf.multiply(y_true, y_pred), axis=[0,1])
-    pred_sumsq = tf.reduce_sum(tf.math.square(y_pred), axis=[0,1])
+    true_sum = tf.reduce_sum(y_true, axis=[0, 1])
+    true_sumsq = tf.reduce_sum(tf.math.square(y_true), axis=[0, 1])
+    product = tf.reduce_sum(tf.multiply(y_true, y_pred), axis=[0, 1])
+    pred_sumsq = tf.reduce_sum(tf.math.square(y_pred), axis=[0, 1])
     count = tf.ones_like(y_true)
-    count = tf.reduce_sum(count, axis=[0,1])
+    count = tf.reduce_sum(count, axis=[0, 1])
 
     true_mean = tf.divide(true_sum, count)
     true_mean2 = tf.math.square(true_mean)
@@ -207,7 +243,7 @@ def metric_r2(y, pred):
     total = true_sumsq - tf.multiply(count, true_mean2)
 
     resid1 = pred_sumsq
-    resid2 = -2*product
+    resid2 = -2 * product
     resid3 = true_sumsq
     resid = resid1 + resid2 + resid3
 
@@ -215,10 +251,9 @@ def metric_r2(y, pred):
     return r2
 
 
-
 def pearsonr_per_seq(y, pred, summarize=False):
-    y_true = tf.cast(y, 'float32')
-    y_pred = tf.cast(pred, 'float32')
+    y_true = tf.cast(y, "float32")
+    y_pred = tf.cast(pred, "float32")
 
     product = tf.reduce_sum(tf.multiply(y_true, y_pred), axis=[1])
 
@@ -263,10 +298,10 @@ def pearsonr_per_seq(y, pred, summarize=False):
 #     return pearson_profile
 
 
-def pearson_volin(pearson_profile,tasks,figsize=(20,5)):
+def pearson_volin(pearson_profile, tasks, figsize=(20, 5)):
     pd_dict = {}
-    for i in range(0,len(tasks)):
-        pd_dict[tasks[i]]=pearson_profile[i]
+    for i in range(0, len(tasks)):
+        pd_dict[tasks[i]] = pearson_profile[i]
 
     pearsonr_pd = pd.DataFrame.from_dict(pd_dict)
     fig, ax = plt.subplots(figsize=figsize)
@@ -274,15 +309,16 @@ def pearson_volin(pearson_profile,tasks,figsize=(20,5)):
     return fig
 
 
-def pearson_box(pearson_profile,tasks,figsize=(20,5)):
+def pearson_box(pearson_profile, tasks, figsize=(20, 5)):
     pd_dict = {}
-    for i in range(0,len(tasks)):
-        pd_dict[tasks[i]]=pearson_profile[i]
+    for i in range(0, len(tasks)):
+        pd_dict[tasks[i]] = pearson_profile[i]
 
     pearsonr_pd = pd.DataFrame.from_dict(pd_dict)
     fig, ax = plt.subplots(figsize=figsize)
     ax = sns.boxplot(data=pearsonr_pd)
     return fig
+
 
 def permute_array(arr, axis=0):
     """Permute array along a certain axis
@@ -297,17 +333,15 @@ def permute_array(arr, axis=0):
         return np.random.permutation(arr.swapaxes(0, axis)).swapaxes(0, axis)
 
 
-
 def bin_counts_amb(x, binsize=2):
-    """Bin the counts
-    """
+    """Bin the counts"""
     if binsize == 1:
         return x
     assert len(x.shape) == 3
     outlen = x.shape[1] // binsize
     xout = np.zeros((x.shape[0], outlen, x.shape[2])).astype(float)
     for i in range(outlen):
-        iterval = x[:, (binsize * i):(binsize * (i + 1)), :]
+        iterval = x[:, (binsize * i) : (binsize * (i + 1)), :]
         has_amb = np.any(iterval == -1, axis=1)
         has_peak = np.any(iterval == 1, axis=1)
         # if no peak and has_amb -> -1
@@ -316,37 +350,41 @@ def bin_counts_amb(x, binsize=2):
         xout[:, i, :] = (has_peak - (1 - has_peak) * has_amb).astype(float)
     return xout
 
+
 def auprc(y_true, y_pred):
-    """Area under the precision-recall curve
-    """
+    """Area under the precision-recall curve"""
     y_true, y_pred = _mask_value_nan(y_true, y_pred)
     return skm.average_precision_score(y_true, y_pred)
 
+
 def bin_counts_max(x, binsize=2):
-    """Bin the counts
-    """
+    """Bin the counts"""
     if binsize == 1:
         return x
     assert len(x.shape) == 3
     outlen = x.shape[1] // binsize
     xout = np.zeros((x.shape[0], outlen, x.shape[2]))
     for i in range(outlen):
-        xout[:, i, :] = x[:, (binsize * i):(binsize * (i + 1)), :].max(1)
+        xout[:, i, :] = x[:, (binsize * i) : (binsize * (i + 1)), :].max(1)
     return xout
 
 
 MASK_VALUE = -1
+
+
 def _mask_value_nan(y_true, y_pred, mask=MASK_VALUE):
     y_true, y_pred = _mask_nan(y_true, y_pred)
     return _mask_value(y_true, y_pred, mask)
 
 
-
 def _mask_nan(y_true, y_pred):
     mask_array = ~np.isnan(y_true)
     if np.any(np.isnan(y_pred)):
-        print("WARNING: y_pred contains {0}/{1} np.nan values. removing them...".
-              format(np.sum(np.isnan(y_pred)), y_pred.size))
+        print(
+            "WARNING: y_pred contains {0}/{1} np.nan values. removing them...".format(
+                np.sum(np.isnan(y_pred)), y_pred.size
+            )
+        )
         mask_array = np.logical_and(mask_array, ~np.isnan(y_pred))
     return y_true[mask_array], y_pred[mask_array]
 
@@ -355,11 +393,15 @@ def _mask_value(y_true, y_pred, mask=MASK_VALUE):
     mask_array = y_true != mask
     return y_true[mask_array], y_pred[mask_array]
 
-def eval_profile(yt, yp,
-                 pos_min_threshold=0.05,
-                 neg_max_threshold=0.01,
-                 required_min_pos_counts=2.5,
-                 binsizes=[1, 2, 4, 10]):
+
+def eval_profile(
+    yt,
+    yp,
+    pos_min_threshold=0.05,
+    neg_max_threshold=0.01,
+    required_min_pos_counts=2.5,
+    binsizes=[1, 2, 4, 10],
+):
     """
     Evaluate the profile in terms of auPR
 
@@ -398,82 +440,96 @@ def eval_profile(yt, yp,
 
         # TODO - I used to have bin_counts_max over here instead of bin_counts_sum
         try:
-            res = auprc(y_true,
-                        np.ravel(bin_counts_max(yp[do_eval], binsize)))
-            res_random = auprc(y_true,
-                               np.ravel(bin_counts_max(yp_random, binsize)))
+            res = auprc(y_true, np.ravel(bin_counts_max(yp[do_eval], binsize)))
+            res_random = auprc(y_true, np.ravel(bin_counts_max(yp_random, binsize)))
         except Exception:
-            print('Exception Encountered')
+            print("Exception Encountered")
             res = np.nan
             res_random = np.nan
 
-        out.append({"binsize": binsize,
-                    "auprc": res,
-                    "random_auprc": res_random,
-                    "n_positives": n_positives,
-                    "frac_ambigous": frac_ambigous,
-                    "imbalance": imbalance
-                    })
+        out.append(
+            {
+                "binsize": binsize,
+                "auprc": res,
+                "random_auprc": res_random,
+                "n_positives": n_positives,
+                "frac_ambigous": frac_ambigous,
+                "imbalance": imbalance,
+            }
+        )
 
     return pd.DataFrame.from_dict(out)
 
+
 class PearsonR(tf.keras.metrics.Metric):
-  def __init__(self, num_targets, summarize=True, name='pearsonr', **kwargs):
-    super(PearsonR, self).__init__(name=name, **kwargs)
-    self._summarize = summarize
-    self._shape = (num_targets,)
-    self._count = self.add_weight(name='count', shape=self._shape, initializer='zeros')
+    def __init__(self, num_targets, summarize=True, name="pearsonr", **kwargs):
+        super(PearsonR, self).__init__(name=name, **kwargs)
+        self._summarize = summarize
+        self._shape = (num_targets,)
+        self._count = self.add_weight(
+            name="count", shape=self._shape, initializer="zeros"
+        )
 
-    self._product = self.add_weight(name='product', shape=self._shape, initializer='zeros')
-    self._true_sum = self.add_weight(name='true_sum', shape=self._shape, initializer='zeros')
-    self._true_sumsq = self.add_weight(name='true_sumsq', shape=self._shape, initializer='zeros')
-    self._pred_sum = self.add_weight(name='pred_sum', shape=self._shape, initializer='zeros')
-    self._pred_sumsq = self.add_weight(name='pred_sumsq', shape=self._shape, initializer='zeros')
+        self._product = self.add_weight(
+            name="product", shape=self._shape, initializer="zeros"
+        )
+        self._true_sum = self.add_weight(
+            name="true_sum", shape=self._shape, initializer="zeros"
+        )
+        self._true_sumsq = self.add_weight(
+            name="true_sumsq", shape=self._shape, initializer="zeros"
+        )
+        self._pred_sum = self.add_weight(
+            name="pred_sum", shape=self._shape, initializer="zeros"
+        )
+        self._pred_sumsq = self.add_weight(
+            name="pred_sumsq", shape=self._shape, initializer="zeros"
+        )
 
-  def update_state(self, y_true, y_pred, sample_weight=None):
-    y_true = tf.cast(y_true, 'float32')
-    y_pred = tf.cast(y_pred, 'float32')
+    def update_state(self, y_true, y_pred, sample_weight=None):
+        y_true = tf.cast(y_true, "float32")
+        y_pred = tf.cast(y_pred, "float32")
 
-    product = tf.reduce_sum(tf.multiply(y_true, y_pred), axis=[0,1])
-    self._product.assign_add(product)
+        product = tf.reduce_sum(tf.multiply(y_true, y_pred), axis=[0, 1])
+        self._product.assign_add(product)
 
-    true_sum = tf.reduce_sum(y_true, axis=[0,1])
-    self._true_sum.assign_add(true_sum)
+        true_sum = tf.reduce_sum(y_true, axis=[0, 1])
+        self._true_sum.assign_add(true_sum)
 
-    true_sumsq = tf.reduce_sum(tf.math.square(y_true), axis=[0,1])
-    self._true_sumsq.assign_add(true_sumsq)
+        true_sumsq = tf.reduce_sum(tf.math.square(y_true), axis=[0, 1])
+        self._true_sumsq.assign_add(true_sumsq)
 
-    pred_sum = tf.reduce_sum(y_pred, axis=[0,1])
-    self._pred_sum.assign_add(pred_sum)
+        pred_sum = tf.reduce_sum(y_pred, axis=[0, 1])
+        self._pred_sum.assign_add(pred_sum)
 
-    pred_sumsq = tf.reduce_sum(tf.math.square(y_pred), axis=[0,1])
-    self._pred_sumsq.assign_add(pred_sumsq)
+        pred_sumsq = tf.reduce_sum(tf.math.square(y_pred), axis=[0, 1])
+        self._pred_sumsq.assign_add(pred_sumsq)
 
-    count = tf.ones_like(y_true)
-    count = tf.reduce_sum(count, axis=[0,1])
-    self._count.assign_add(count)
+        count = tf.ones_like(y_true)
+        count = tf.reduce_sum(count, axis=[0, 1])
+        self._count.assign_add(count)
 
-  def result(self):
-    true_mean = tf.divide(self._true_sum, self._count)
-    true_mean2 = tf.math.square(true_mean)
-    pred_mean = tf.divide(self._pred_sum, self._count)
-    pred_mean2 = tf.math.square(pred_mean)
+    def result(self):
+        true_mean = tf.divide(self._true_sum, self._count)
+        true_mean2 = tf.math.square(true_mean)
+        pred_mean = tf.divide(self._pred_sum, self._count)
+        pred_mean2 = tf.math.square(pred_mean)
 
-    term1 = self._product
-    term2 = -tf.multiply(true_mean, self._pred_sum)
-    term3 = -tf.multiply(pred_mean, self._true_sum)
-    term4 = tf.multiply(self._count, tf.multiply(true_mean, pred_mean))
-    covariance = term1 + term2 + term3 + term4
+        term1 = self._product
+        term2 = -tf.multiply(true_mean, self._pred_sum)
+        term3 = -tf.multiply(pred_mean, self._true_sum)
+        term4 = tf.multiply(self._count, tf.multiply(true_mean, pred_mean))
+        covariance = term1 + term2 + term3 + term4
 
-    true_var = self._true_sumsq - tf.multiply(self._count, true_mean2)
-    pred_var = self._pred_sumsq - tf.multiply(self._count, pred_mean2)
-    tp_var = tf.multiply(tf.math.sqrt(true_var), tf.math.sqrt(pred_var))
-    correlation = tf.divide(covariance, tp_var)
+        true_var = self._true_sumsq - tf.multiply(self._count, true_mean2)
+        pred_var = self._pred_sumsq - tf.multiply(self._count, pred_mean2)
+        tp_var = tf.multiply(tf.math.sqrt(true_var), tf.math.sqrt(pred_var))
+        correlation = tf.divide(covariance, tp_var)
 
-    if self._summarize:
-        return tf.reduce_mean(correlation)
-    else:
-        return correlation
+        if self._summarize:
+            return tf.reduce_mean(correlation)
+        else:
+            return correlation
 
-  def reset_states(self):
-      K.batch_set_value([(v, np.zeros(self._shape)) for v in self.variables])
+    def reset_states(self):
+        K.batch_set_value([(v, np.zeros(self._shape)) for v in self.variables])
