@@ -8,8 +8,6 @@ import yaml
 
 import metrics
 
-# from loss import *
-
 
 def basenjimod(input_shape, output_shape, wandb_config={}):
     #  add_dropout, filtN_1=64, filtN_2=64, filt_mlt=1.125,
