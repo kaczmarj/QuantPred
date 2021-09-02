@@ -1,17 +1,9 @@
 #!/usr/bin/env python
 """SeqNN trainer"""
-import time
 from packaging import version
-import pdb
-from wandb.keras import WandbCallback
-from wandb_callbacks import *
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.ops import math_ops
-from tensorflow.python.framework import ops
-from tensorflow.python.framework import dtypes
 
-import metrics
 
 
 class Trainer:

@@ -2,21 +2,17 @@
 # coding: utf-8
 
 
-import pyBigWig, os, sys
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 import matplotlib.gridspec as gridspec
 import seaborn as sns
-import shutil, wandb
-import itertools
-import numpy as np
 
 # from test_to_bw import *
-from test_to_bw_fast import process_run, get_vals_per_range, remove_nans
+from test_to_bw_fast import get_vals_per_range, remove_nans
 import util
-import metrics
 from util import SeabornFig2Grid
 
 # N_cell_line = 12

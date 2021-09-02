@@ -1,21 +1,12 @@
 #!/usr/bin/env python
-import tensorflow as tf
 import util
 from test_to_bw_fast import read_model
-import metrics
 import wandb
 from test_to_bw_fast import get_config
 import glob, os
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from test_to_bw_fast import open_bw
 import numpy as np
-from sklearn.metrics import mean_squared_error, mean_squared_log_error
 from tqdm import tqdm
-from scipy.spatial import distance
-from scipy import stats
-import pickle
 from metrics import np_poiss, np_mse, get_scaled_mse, get_js_dist, np_pr
 
 

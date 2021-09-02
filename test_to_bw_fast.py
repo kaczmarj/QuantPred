@@ -1,28 +1,23 @@
 #!/usr/bin/env python
 import util
-import os, shutil
+import os
 import numpy as np
 import csv
 import pyBigWig
 import tensorflow as tf
 from modelzoo import GELU
-import metrics
-import loss
-import custom_fit
-import time, sys
+import time
+import sys
 from scipy import stats
-from loss import *
-import yaml, glob
+import yaml
+import glob
 import subprocess
-import gzip
 import pandas as pd
-from scipy.ndimage import gaussian_filter1d
 from tqdm import tqdm
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from scipy.spatial import distance
-import wandb
 
 
 def enforce_constant_size(bed_path, output_path, window, compression=None):

@@ -3,14 +3,9 @@
 import json
 import os
 import h5py
-import sys
 import util
 from optparse import OptionParser
-from natsort import natsorted
-import numpy as np
 import tensorflow as tf
-from modelzoo import *
-from loss import *
 
 
 def main():

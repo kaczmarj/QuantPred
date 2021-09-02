@@ -1,27 +1,18 @@
-import sys
 import json
 import os
-import time
 import glob
-from scipy.stats import pearsonr
-import shutil
-import hashlib
-import sys
-import pandas as pd
-from sklearn.metrics import r2_score
-import time
 import numpy as np
 import tensorflow as tf
 from natsort import natsorted
-import tensorflow as tf
 
 # import metrics
 import scipy
-import yaml
 
 ################################################################
 # functions for loading tfr files into tfr dataset
 ################################################################
+
+
 def bin_resolution(y, bin_size):
     y_dim = y.shape
     y_bin = tf.math.reduce_mean(

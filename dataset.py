@@ -15,8 +15,6 @@
 from __future__ import print_function
 import glob
 import json
-import os
-import pdb
 import sys
 
 from natsort import natsorted

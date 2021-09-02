@@ -1,22 +1,10 @@
 #!/usr/bin/env python
 
-import pyBigWig, os
-import numpy as np
+import os
 import pandas as pd
-import subprocess
-from scipy import stats
-import matplotlib.pyplot as plt
-import seaborn as sns
-import shutil
-import util, sys
-import wandb
-from test_to_bw_fast import get_vals_per_range, get_list_pr
-import time
-from tqdm import tqdm
-from scipy import stats
-import sys, os
-from tqdm import tqdm
 import util
+from test_to_bw_fast import get_vals_per_range, get_list_pr
+from tqdm import tqdm
 import multiprocessing as mp
 from scipy.ndimage import gaussian_filter1d
 

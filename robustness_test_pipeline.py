@@ -1,20 +1,8 @@
 import tensorflow as tf
 import h5py
 import explain
-import custom_fit
 import modelzoo
-from loss import *
-import os, json
-import util
-import pandas as pd
-import importlib
-import seaborn as sns
-import scipy
-import matplotlib.pyplot as plt
-import metrics
-import csv
 import sys
-import h5py
 
 test_data = "./datasets/VCF/filtered_test.h5"
 f = h5py.File(test_data, "r")
